@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Image Previewer</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        .control-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"] { width: 100%; max-width: 500px; padding: 5px; }
+        .preview-box { margin-top: 20px; max-width: 500px; }
+        img { max-width: 100%; height: auto; display: none; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+
+    <!-- File Picker Input -->
+    <div class="control-group">
+        <label for="fileInput">Select Image File:</label>
+        <input type="file" id="fileInput" accept="image/*">
+    </div>
+
+    <!-- Text Input for File Name Display/Entry -->
+    <div class="control-group">
+        <label for="nameInput">Selected File Name:</label>
+        <input type="text" id="nameInput" placeholder="No file selected" value="IMG_3791.jpeg">
+    </div>
+
+    <!-- Image Preview Container -->
+    <div class="preview-box">
+        <p id="placeholder">No image loaded</p>
+        <img id="preview" alt="Image Preview">
+    </div>
+
+    <script>
+        // Internal image constant mapping names to their source paths
+        const img = { 
+            "IMG_3791.jpeg": "https://beans65785.github.io/images/IMG_3791.jpeg" 
+        };
+
+        const fileInput = document.getElementById('fileInput');
+        const nameInput = document.getElementById('nameInput');
+        const preview = document.getElementById('preview');
+        const placeholder = document.getElementById('placeholder');
+
+        // Function to update image display
+        function showImage(src) {
+            preview.src = src;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+        }
+
+        // Handle File Picker Changes
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                nameInput.value = file.name; // Update text box with file name
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    showImage(e.target.result);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle Manual Entry in Text Box
+        nameInput.addEventListener('input', function() {
+            const enteredName = this.value.trim();
+            
+            // Check if entered name matches our constant map database
+            if (img[enteredName]) {
+                showImage(img[enteredName]);
+            } else {
+                preview.style.display = 'none';
+                placeholder.style.display = 'block';
+                placeholder.textContent = "File name matching constant map not found.";
+            }
+        });
+
+        // Initialize with default sample image mapping on load
+        if (img[nameInput.value]) {
+            showImage(img[nameInput.value]);
+        }
+    </script>
+</body>
+</html>
